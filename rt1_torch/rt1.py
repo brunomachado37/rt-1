@@ -155,7 +155,8 @@ class BCTraining(L.LightningModule):
     def __init__(self,  
                  model: nn.Module, 
                  learning_rate: float = 1e-3, 
-                 weight_decay: float = 0.01
+                 weight_decay: float = 0.01,
+                 epochs: int = 30,
                 ):
         super().__init__()
         self.save_hyperparameters(ignore="model")
@@ -163,6 +164,7 @@ class BCTraining(L.LightningModule):
         self.model = model
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
+        self.epochs = epochs
 
     def training_step(self, batch, batch_idx):
         """
@@ -219,5 +221,6 @@ class BCTraining(L.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
-        # return [optimizer], [{'scheduler': torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.9), 'interval': 'epoch'}]
-        return optimizer
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.epochs)
+
+        return [optimizer], [{'scheduler': scheduler, 'interval': 'step', 'frequency': 1}]

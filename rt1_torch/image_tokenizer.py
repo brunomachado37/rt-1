@@ -54,6 +54,7 @@ class ImageTokenizer(nn.Module):
     def forward(self, images: Tensor, context: Tensor = None):
         B, T, C, H, W = images.shape
         images = torch.reshape(images, [B * T, C, H, W])                     # Fold time into batch dimension
+        context = torch.reshape(context, [B * T, -1])
 
         if self.use_film:
             last_feature_maps = self.vision_model(images, context)
