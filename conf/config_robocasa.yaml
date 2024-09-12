@@ -12,22 +12,23 @@ model:
   action_dim: 1
   action_readout_tokens: 7
 training:
-  learning_rate: 1e-3
+  learning_rate: 1e-4
   weight_decay: 0.01
 trainer:
   default_root_dir: "./runs"
   fast_dev_run: False
-  max_epochs: 10
+  max_epochs: 30
   gradient_clip_val: 1.0
   val_check_interval: 1.0
 logger:
   project: "RT-1-RoboCasa"
+  name: "00 - Test"
   log_model: "all"
   save_dir: "./runs"
 dataloader: 
-  batch_size: 2
+  batch_size: 32
   validation_percentage: 0.2
-  num_workers: 0
+  num_workers: 8
 data:
   language_encoder: "clip"
   validate: false
@@ -77,4 +78,4 @@ data:
   - horizon: 500
     do_eval: false
     filter_key: 50_demos
-    path: "/home/bmachado/Documents/Experiments/Simulators/robocasa/datasets/v0.1/single_stage/kitchen_drawer/CloseDrawer/2024-04-30/demo_gentex_im128_randcams.hdf5"
+    path: "/home/liris/bmachado/robocasa/datasets/v0.1/single_stage/kitchen_drawer/CloseDrawer/2024-04-30/demo_gentex_im128_randcams.hdf5"

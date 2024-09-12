@@ -1088,7 +1088,7 @@ class MetaDataset(torch.utils.data.Dataset):
         ds_ind = np.digitize(idx, self._ds_ind_bins) - 1
         ind_in_ds = idx - self._ds_ind_bins[ds_ind]
         meta = self.datasets[ds_ind].__getitem__(ind_in_ds)
-        meta["index"] = idx
+        # meta["index"] = idx
         return meta
 
     def get_ds_label(self, idx):

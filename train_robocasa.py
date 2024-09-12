@@ -18,12 +18,24 @@ def train(config):
     seed_everything(42, workers=True)
 
     model = RT1(**config.model)
-    lightning_model = BCTraining(model, epochs=config.trainer.max_epochs, **config.training)
-
+    
     data_config = SimpleNamespace(**config.data)
     data_config.image_transform = model.image_tokenizer.vision_model_weights.transforms()
     lang_encoder = language_encoder_factory(model=data_config.language_encoder, device="cuda")
     training_set, validation_set = load_data_for_training(data_config, obs_keys=data_config.all_obs_keys, lang_encoder=lang_encoder)
+
+    max_num_steps = (len(training_set) // config.dataloader.batch_size) * config.trainer.max_epochs
+    lightning_model = BCTraining(model, steps=max_num_steps, **config.training)
+
+    # Release memory used by language encoder
+    print(f"Torch CUDA memory allocated: {torch.cuda.memory_allocated()/1_000_000:.0f} Mb")
+    if hasattr(training_set, "lang_encoder"):
+        del training_set.lang_encoder
+    else:
+        for i in range(len(training_set.datasets)):
+            del training_set.datasets[i].lang_encoder 
+    del lang_encoder
+    print(f"Torch CUDA memory allocated: {torch.cuda.memory_allocated()/1_000_000:.0f} Mb\n")
 
     if config.data.validate:
         validation_set_size = int(len(training_set) * config.dataloader.validation_percentage)
