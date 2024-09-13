@@ -35,7 +35,7 @@ dataloader:
   validation_percentage: 0.2
   num_workers: 8
 data:
-  data_root: './data/PushCubeTask_BC'
+  data_root: './data/PushCube_variety/'
   n_sample_frames: 16 
   frame_offset: 1 
   load_img: True
