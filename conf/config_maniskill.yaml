@@ -6,7 +6,7 @@ model:
   attention_mode: "timestep_causal"
   vision_model: "efficientnet_b3"
   vision_model_weights: "EfficientNet_B3_Weights"
-  language_embedding_dim: 768
+  language_embedding_dim: 1
   num_tokens_per_image: 8
   action_space: "continuous"
   action_dim: 1

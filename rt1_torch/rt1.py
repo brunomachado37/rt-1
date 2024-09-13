@@ -59,7 +59,7 @@ class RT1(nn.Module):
                 embedding_output_dim=token_dim, 
                 vision_model_factory=getattr(efficientnet, vision_model),
                 vision_model_weights=getattr(efficientnet, vision_model_weights).DEFAULT,
-                use_film=True,
+                use_film=False,
                 film_context_size=language_embedding_dim,
                 use_token_learner=True, 
                 num_output_tokens=num_tokens_per_image
