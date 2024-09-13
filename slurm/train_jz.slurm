@@ -25,4 +25,4 @@ export TORCH_DISTRIBUTED_DEBUG=INFO
 export PYTHONPATH=.
 export CUDA_VISIBLE_DEVICES=0,1 
 
-srun train_oc.py
+srun python train_oc.py
