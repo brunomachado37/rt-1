@@ -1,0 +1,45 @@
+model:
+  num_layers: 8
+  token_dim: 512
+  num_heads: 8
+  dropout_rate: 0.1
+  attention_mode: "timestep_causal"
+  vision_model: "efficientnet_b3"
+  vision_model_weights: "EfficientNet_B3_Weights"
+  language_embedding_dim: 768
+  num_tokens_per_image: 8
+  action_space: "continuous"
+  action_dim: 1
+  action_readout_tokens: 7
+training:
+  learning_rate: 1e-4
+  weight_decay: 0.01
+trainer:
+  default_root_dir: "./runs"
+  fast_dev_run: False
+  max_epochs: 30
+  gradient_clip_val: 1.0
+  val_check_interval: 1.0
+  accelerator: "gpu"
+  devices: 2
+  nodes: 1
+  strategy: "ddp"
+logger:
+  project: "RT-1-RoboCasa"
+  name: "00 - Test"
+  log_model: "all"
+  save_dir: "./runs"
+  offline: True
+dataloader: 
+  batch_size: 32
+  validation_percentage: 0.2
+  num_workers: 8
+data:
+  data_root: './data/PushCubeTask_BC'
+  n_sample_frames: 16 
+  frame_offset: 1 
+  load_img: True
+  filter_enter: True
+  max_files: None
+  load_traj: True
+  resolution: 128

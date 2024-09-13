@@ -224,3 +224,4 @@ class BCTraining(L.LightningModule):
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.steps)
 
         return [optimizer], [{'scheduler': scheduler, 'interval': 'step', 'frequency': 1}]
+    
