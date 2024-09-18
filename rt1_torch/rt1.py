@@ -21,8 +21,8 @@ class RT1(nn.Module):
                  language_embedding_dim: int = 768,
                  num_tokens_per_image: int = 8,
                  action_space: Literal["discrete", "continuous"] = "continuous",
-                 action_dim: int = 1,
-                 action_readout_tokens: int = 8):
+                 action_dim: int = 7,
+                 action_readout_tokens: int = 1):
         """
         Arguments:
         num_layers: int - Number of transformer layers.

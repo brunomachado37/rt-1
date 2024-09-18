@@ -1,7 +1,7 @@
 import os
 import torch
 from transformers import AutoTokenizer, CLIPTextModelWithProjection, BertModel
-from llm2vec import LLM2Vec
+# from llm2vec import LLM2Vec
 from typing import Literal
 
 
