@@ -1,0 +1,80 @@
+model:
+  embedding_output_dim: 512
+  use_film: true
+  film_context_size: 768
+  use_token_learner: true
+  num_output_tokens: 1
+  vision_model: "efficientnet_b3"
+  vision_model_weights: "EfficientNet_B3_Weights"
+training:
+  learning_rate: 1e-4
+  weight_decay: 0.01
+trainer:
+  default_root_dir: "./runs"
+  fast_dev_run: False
+  max_epochs: 30
+  gradient_clip_val: 1.0
+  val_check_interval: 1.0
+logger:
+  project: "EfficientNet-RoboCasa-Contrastive"
+  log_model: "all"
+  save_dir: "./runs"
+  name: "01 - Drawer"
+dataloader: 
+  batch_size: 4
+  validation_percentage: 0.2
+  num_workers: 0
+data:
+  language_encoder: "clip"
+  validate: false
+  action_keys:
+  - actions
+  dataset_keys:
+  - actions
+  action_config:
+    actions:
+      normalization: 
+    action_dict/abs_pos:
+      normalization: min_max
+    action_dict/abs_rot_axis_angle:
+      normalization: min_max
+      format: rot_axis_angle
+    action_dict/abs_rot_6d:
+      normalization: 
+      format: rot_6d
+    action_dict/rel_pos:
+      normalization: 
+    action_dict/rel_rot_axis_angle:
+      normalization: 
+      format: rot_axis_angle
+    action_dict/rel_rot_6d:
+      normalization: 
+      format: rot_6d
+    action_dict/gripper:
+      normalization: 
+    action_dict/base_mode:
+      normalization: 
+  all_obs_keys:
+  - robot0_agentview_left_image
+  seq_length: 1
+  pad_seq_length: false
+  frame_stack: 1
+  pad_frame_stack: false
+  hdf5_normalize_obs: false
+  hdf5_load_next_obs: false
+  hdf5_cache_mode: 
+  hdf5_use_swmr: true
+  goal_mode: 
+  shuffled_obs_key_groups: 
+  hdf5_filter_key: 
+  hdf5_validation_filter_key: 
+  data_format: robomimic
+  data:
+  - horizon: 500
+    do_eval: false
+    filter_key: 50_demos
+    path: "/home/liris/bmachado/robocasa/datasets/v0.1/single_stage/kitchen_drawer/CloseDrawer/2024-04-30/demo_gentex_im448_randcams.hdf5"
+  # - horizon: 500
+  #   do_eval: false
+  #   filter_key: 3000_demos
+  #   path: "/home/liris/bmachado/robocasa/datasets/v0.1/single_stage/kitchen_drawer/CloseDrawer/mg/2024-05-09-09-32-19/demo_gentex_im448_randcams.hdf5"

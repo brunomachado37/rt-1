@@ -11,7 +11,7 @@ from copy import deepcopy
 from data.robocasa.dataset import InterleavedDataset, R2D2Dataset, MetaDataset
 
 
-def load_data_for_training(config, obs_keys, lang_encoder=None):
+def load_data_for_training(config, obs_keys, lang_encoder=None, batch_transform=None):
     """
     Data loading at the start of an algorithm.
 
@@ -51,24 +51,27 @@ def load_data_for_training(config, obs_keys, lang_encoder=None):
             config, obs_keys,
             filter_by_attribute=train_filter_by_attribute,
             lang_encoder=lang_encoder,
+            batch_transform=batch_transform
         )
         valid_dataset = dataset_factory(
             config, obs_keys,
             filter_by_attribute=valid_filter_by_attribute,
             lang_encoder=lang_encoder,
+            batch_transform=batch_transform
         )
     else:
         train_dataset = dataset_factory(
             config, obs_keys,
             filter_by_attribute=train_filter_by_attribute,
             lang_encoder=lang_encoder,
+            batch_transform=batch_transform
         )
         valid_dataset = None
 
     return train_dataset, valid_dataset
 
 
-def dataset_factory(config, obs_keys, filter_by_attribute=None, dataset_path=None, lang_encoder=None):
+def dataset_factory(config, obs_keys, filter_by_attribute=None, dataset_path=None, lang_encoder=None, batch_transform=None):
     """
     Create a SequenceDataset instance to pass to a torch DataLoader.
 
@@ -109,7 +112,7 @@ def dataset_factory(config, obs_keys, filter_by_attribute=None, dataset_path=Non
         filter_by_attribute=filter_by_attribute,
         shuffled_obs_key_groups=config.shuffled_obs_key_groups,
         lang_encoder=lang_encoder,
-        image_transform=config.image_transform,
+        batch_transform=batch_transform,
     )
 
     ds_kwargs["hdf5_path"] = [ds_cfg["path"] for ds_cfg in config.data]

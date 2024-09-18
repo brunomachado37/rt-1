@@ -1253,11 +1253,11 @@ def action_stats_to_normalization_stats(action_stats, action_config):
 class InterleavedDataset(SequenceDataset):
     def __init__(
         self,
-        image_transform,
+        batch_transform,
         **kwargs
     ):
         super(InterleavedDataset, self).__init__(**kwargs)
-        self.batch_transform = RoboCasaBatchTransform(image_transform)
+        self.batch_transform = batch_transform
 
 
     def __getitem__(self, index):
@@ -1282,3 +1282,24 @@ class RoboCasaBatchTransform:
         images = self.image_transform(imgs)
 
         return dict(images=images, language_embeddings=language_embeddings, actions=actions)
+    
+
+class ContrastiveBatchTransform:
+    def __init__(self, image_transform, predict_stop_token=False):
+        self.image_transform = image_transform
+        self.predict_stop_token = predict_stop_token
+
+    def __call__(self, robomimic_batch):
+        actions = robomimic_batch["actions"][:, :7]         
+        # take one of the 3 images at random OR take all 3
+        imgs = torch.permute(torch.tensor(robomimic_batch["obs"]["robot0_agentview_left_image"]), (0, 3, 1, 2))         # T, H, W, C -> T, C, H, W
+        lang = robomimic_batch["obs"]["lang_emb"]
+
+        if self.predict_stop_token:
+            pass        # It can be added with "dones" key word in the SequenceDataset (dataset_keys = ["actions", "dones"])
+
+        # Tensorize =>> Run Image Transform to get `pixel_values`
+        language_embeddings, actions = torch.tensor(lang), torch.tensor(actions, dtype=torch.float32)
+        images = self.image_transform(imgs)
+
+        return dict(images=images, context=language_embeddings, actions=actions)
