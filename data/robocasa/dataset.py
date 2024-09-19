@@ -264,7 +264,7 @@ class SequenceDataset(torch.utils.data.Dataset):
                 self.total_num_sequences += 1
 
         
-        if len(self._demo_id_to_demo_lang_str) > 0:
+        if len(self._demo_id_to_demo_lang_str) > 0 and self.lang_encoder is not None:
             print("getting language embeddings...")
             for ep_batch in tqdm(np.array_split(self.demos, int(math.ceil(len(self.demos) / 64)))):
                 # get language embedding
@@ -1303,3 +1303,26 @@ class ContrastiveBatchTransform:
         images = self.image_transform(imgs)
 
         return dict(images=images, context=language_embeddings, actions=actions)
+    
+
+class MultiViewContrastiveBatchTransform:
+    def __init__(self, image_transform, predict_stop_token=False):
+        self.image_transform = image_transform
+        self.predict_stop_token = predict_stop_token
+
+    def __call__(self, robomimic_batch):
+        actions = robomimic_batch["actions"][:, :7]         
+
+        imgs_1 = torch.permute(torch.tensor(robomimic_batch["obs"]["robot0_agentview_left_image"]), (0, 3, 1, 2))         # T, H, W, C -> T, C, H, W
+        imgs_2 = torch.permute(torch.tensor(robomimic_batch["obs"]["robot0_agentview_right_image"]), (0, 3, 1, 2))        # T, H, W, C -> T, C, H, W
+        lang = robomimic_batch["obs"]["lang_emb"]
+
+        if self.predict_stop_token:
+            pass        # It can be added with "dones" key word in the SequenceDataset (dataset_keys = ["actions", "dones"])
+
+        # Tensorize =>> Run Image Transform to get `pixel_values`
+        language_embeddings, actions = torch.tensor(lang), torch.tensor(actions, dtype=torch.float32)
+        images_1 = self.image_transform(imgs_1)
+        images_2 = self.image_transform(imgs_2)
+
+        return dict(view_1=images_1, view_2=images_2, context=language_embeddings, actions=actions)

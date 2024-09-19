@@ -8,15 +8,15 @@ from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
 from lightning.pytorch import seed_everything
 
 from rt1_torch.image_tokenizer import ImageTokenizer
-from rt1_torch.contrastive import ActionContrativeTraining
+from rt1_torch.contrastive import CameraContrativeTraining
 import rt1_torch.efficientnet as efficientnet
 
-from data.robocasa.dataset import ContrastiveBatchTransform
+from data.robocasa.dataset import MultiViewContrastiveBatchTransform
 from data.robocasa.train_utils import load_data_for_training
 from data.robocasa.lang_utils import language_encoder_factory
 
 
-@hydra.main(version_base=None, config_path="conf/contrastive", config_name="01_config_contrastive-drawer")
+@hydra.main(version_base=None, config_path="conf/camera_contrastive", config_name="01_config")
 def train(config):
     seed_everything(42, workers=True)
 
@@ -27,7 +27,7 @@ def train(config):
                            vision_model_factory=backbone, 
                            vision_model_weights=pretrained_weights)
     
-    batch_transform = ContrastiveBatchTransform(model.vision_model_weights.transforms())
+    batch_transform = MultiViewContrastiveBatchTransform(model.vision_model_weights.transforms())
     lang_encoder = language_encoder_factory(model=config.data.language_encoder, device="cuda")
     training_set, validation_set = load_data_for_training(config.data, 
                                                           obs_keys=config.data.all_obs_keys, 
@@ -35,7 +35,7 @@ def train(config):
                                                           batch_transform=batch_transform)   
 
     max_num_steps = (len(training_set) // config.dataloader.batch_size) * config.trainer.max_epochs
-    lightning_model = ActionContrativeTraining(model, steps=max_num_steps, **config.training)
+    lightning_model = CameraContrativeTraining(model, steps=max_num_steps, **config.training)
 
     # Release memory used by language encoder
     print(f"Torch CUDA memory allocated: {torch.cuda.memory_allocated()/1_000_000:.0f} Mb")
